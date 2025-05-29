@@ -10,7 +10,5 @@ import com.estore.model.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    List<User> findAll();
-
     Optional<User> findByEmail(String email);
 }
