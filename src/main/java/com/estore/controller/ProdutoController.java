@@ -3,7 +3,6 @@ package com.estore.controller;
 import com.estore.dto.request.ProdutoRequest;
 import com.estore.dto.response.ProdutoResponse;
 import com.estore.service.ProdutoService;
-import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.*;

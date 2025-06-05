@@ -32,6 +32,10 @@ public class Pedido {
     @JoinColumn(name = "pedido_id")
     private List<ItemPedido> itens;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private StatusPedido status;
+
     public void calcularValorTotal() {
         this.valorTotal = itens.stream()
                 .map(ItemPedido::calcularSubtotal)
