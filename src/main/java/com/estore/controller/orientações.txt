@@ -1,0 +1,9 @@
+# Proteger rotas de cadastro de produtos
+@PreAuthorize("hasRole('ADMIN')")
+
+ex.:
+@PreAuthorize("hasRole('ADMIN')")
+@PostMapping("/produtos")
+public ResponseEntity<ProdutoResponse> cadastrarProduto(@Valid @RequestBody ProdutoRequest request) {
+    // lógica de cadastro
+}

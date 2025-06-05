@@ -9,4 +9,5 @@ public interface UserService {
     List<UserResponse> listarTodos();
 
     UserResponse cadastrar(UserRequest req);
+
 }
