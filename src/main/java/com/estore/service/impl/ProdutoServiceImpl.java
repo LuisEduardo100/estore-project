@@ -2,7 +2,9 @@ package com.estore.service.impl;
 
 import com.estore.dto.request.ProdutoRequest;
 import com.estore.dto.response.ProdutoResponse;
+import com.estore.model.Categoria;
 import com.estore.model.Produto;
+import com.estore.repository.CategoriaRepository;
 import com.estore.repository.ProdutoRepository;
 import com.estore.service.ProdutoService;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 public class ProdutoServiceImpl implements ProdutoService {
 
     private final ProdutoRepository produtoRepository;
+    private final CategoriaRepository categoriaRepository;
 
     @Override
     public ProdutoResponse criar(ProdutoRequest request) {
@@ -43,10 +46,15 @@ public class ProdutoServiceImpl implements ProdutoService {
         Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Produto não encontrado"));
 
+        Categoria categoria = categoriaRepository.findById(produto.getCategoria().getId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Categoria não encontrada com o ID: " + produto.getCategoria().getId()));
+
         produto.setNome(request.getNome());
         produto.setMarca(request.getMarca());
-        produto.setCategoria(request.getCategoria());
+        produto.setCategoria(categoria);
         produto.setPreco(request.getPreco());
+        produto.setEstoque(request.getEstoque());
         produto.setDescricao(request.getDescricao());
         produto.setImagens(request.getImagens());
         produto.setVariacoes(request.getVariacoes());
@@ -63,15 +71,14 @@ public class ProdutoServiceImpl implements ProdutoService {
     }
 
     private Produto mapToEntity(ProdutoRequest request) {
-        return Produto.builder()
-                .nome(request.getNome())
-                .marca(request.getMarca())
-                .categoria(request.getCategoria())
-                .preco(request.getPreco())
-                .descricao(request.getDescricao())
-                .imagens(request.getImagens())
-                .variacoes(request.getVariacoes())
-                .build();
+        Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Categoria não encontrada com o ID: " + request.getCategoriaId()));
+
+        return Produto.builder().nome(request.getNome()).marca(request.getMarca()).categoria(categoria)
+                .preco(request.getPreco()).descricao(request.getDescricao()).imagens(request.getImagens())
+                .estoque(request.getEstoque())
+                .variacoes(request.getVariacoes()).build();
     }
 
     private ProdutoResponse mapToResponse(Produto produto) {
@@ -79,7 +86,9 @@ public class ProdutoServiceImpl implements ProdutoService {
                 .id(produto.getId())
                 .nome(produto.getNome())
                 .marca(produto.getMarca())
-                .categoria(produto.getCategoria())
+                .estoque(produto.getEstoque())
+                .categoria(produto.getCategoria().getNome())
+                .categoriaId(produto.getCategoria().getId())
                 .preco(produto.getPreco())
                 .descricao(produto.getDescricao())
                 .imagens(produto.getImagens())

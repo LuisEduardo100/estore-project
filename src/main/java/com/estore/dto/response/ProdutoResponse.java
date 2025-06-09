@@ -14,7 +14,9 @@ public class ProdutoResponse {
     private Long id;
     private String nome;
     private String marca;
+    private Integer estoque;
     private String categoria;
+    private Long categoriaId;
     private BigDecimal preco;
     private String descricao;
     private List<String> imagens;
