@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -23,12 +24,15 @@ public class Produto {
     private String nome;
 
     private String marca;
-    private String categoria;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "categoria_id", nullable = false)
+    private Categoria categoria;
 
     @Column(nullable = false)
     private BigDecimal preco;
 
     private String descricao;
+    private Integer estoque;
 
     @ElementCollection
     @CollectionTable(name = "produto_imagens", joinColumns = @JoinColumn(name = "produto_id"))
@@ -40,4 +44,18 @@ public class Produto {
     @MapKeyColumn(name = "chave")
     @Column(name = "valor")
     private Map<String, String> variacoes;
+
+    private LocalDateTime dataCriacao;
+    private LocalDateTime dataAtualizacao;
+
+    @PrePersist
+    protected void onCreate() {
+        this.dataCriacao = LocalDateTime.now();
+        this.dataAtualizacao = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.dataAtualizacao = LocalDateTime.now();
+    }
 }

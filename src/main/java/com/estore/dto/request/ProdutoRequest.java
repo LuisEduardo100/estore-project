@@ -14,7 +14,8 @@ import java.util.Map;
 public class ProdutoRequest {
     @NotBlank
     private String nome;
-
+    @NotNull(message = "O ID da categoria é obrigatório.")
+    private Long categoriaId; // Adicione este campo
     private String marca;
     private String categoria;
 
@@ -23,6 +24,10 @@ public class ProdutoRequest {
     private BigDecimal preco;
 
     private String descricao;
+
+    @NotNull(message = "O estoque do produto é obrigatório.")
+    @Min(value = 0, message = "O estoque não pode ser negativo.")
+    private Integer estoque;
 
     private List<String> imagens;
 
