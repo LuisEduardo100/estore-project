@@ -15,7 +15,8 @@ public class ProdutoRequest {
     @NotBlank
     private String nome;
     @NotNull(message = "O ID da categoria é obrigatório.")
-    private Long categoriaId; // Adicione este campo
+    private Long categoriaId;
+
     private String marca;
     private String categoria;
 

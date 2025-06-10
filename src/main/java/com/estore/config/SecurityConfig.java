@@ -33,25 +33,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(Customizer.withDefaults()) // Habilita o CORS configurado globalmente
-                .csrf(AbstractHttpConfigurer::disable) // Desabilita CSRF para APIs RESTful
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/usuarios", "/api/usuarios/cadastrar", "/api/usuarios/login").permitAll()
+                        // 1. Rotas de autenticação (cadastro/login) - MAIS ESPECÍFICAS, SEMPRE
+                        // PERMITIDAS
+                        .requestMatchers("/api/usuarios/cadastrar", "/api/usuarios/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
 
+                        // 2. Rotas GET públicas (visualização sem login)
                         .requestMatchers(HttpMethod.GET, "/api/produtos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+
+                        // 3. Rotas que exigem ROLE_ADMIN
                         .requestMatchers(HttpMethod.POST, "/api/produtos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/produtos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/produtos/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/pedidos/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/categorias/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categorias/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categorias/**").hasRole("ADMIN") // <-- Voltou para
+                                                                                                   // hasRole("ADMIN")
+                                                                                                   // aqui
 
                         .requestMatchers(HttpMethod.GET, "/api/pedidos/**").hasRole("ADMIN")
 
-                        .requestMatchers(HttpMethod.POST, "/api/categorias/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/api/categorias/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/categorias/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/categorias/**").permitAll()
+                        // 4. Rotas que exigem APENAS AUTENTICAÇÃO (ex: criar pedido)
+                        .requestMatchers(HttpMethod.POST, "/api/pedidos/**").authenticated()
 
+                        // 5. Qualquer outra requisição que não foi explicitamente permitida acima,
+                        // exige autenticação.
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
